@@ -24,7 +24,7 @@ class HAAlpr(object):
         """Process a byte image buffer."""
         result = []
 
-        alpr = subprocess.popen(
+        alpr = subprocess.Popen(
             self._cmd,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
