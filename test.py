@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from haalpr import HAAlpr
 
 if sys.platform == "win32":
