@@ -1,4 +1,4 @@
-import asyncio.subprocess
+import subprocess
 import re
 import io
 
@@ -20,20 +20,19 @@ class HAAlpr(object):
         self.__re_plate = re.compile(RE_ALPR_PLATE)
         self.__re_result = re.compile(RE_ALPR_RESULT)
 
-    @asyncio.coroutine
     def recognize_byte(self, image):
         """Process a byte image buffer."""
         result = []
 
-        alpr = yield from asyncio.create_subprocess_exec(
-            *self._cmd,
-            stdin=asyncio.subprocess.PIPE,
-            stdout=asyncio.subprocess.PIPE,
-            stderr=asyncio.subprocess.DEVNULL
+        alpr = subprocess.popen(
+            self._cmd,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
         )
 
         # send image
-        stdout, stderr = yield from alpr.communicate(input=image)
+        stdout, stderr = alpr.communicate(input=image)
         stdout = io.StringIO(str(stdout, 'utf-8'))
 
         tmp_res = {}
