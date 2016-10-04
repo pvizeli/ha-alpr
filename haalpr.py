@@ -1,3 +1,4 @@
+"""Home-Assistant OpenAlpr command line wrapper."""
 import io
 import logging
 import re
@@ -8,6 +9,8 @@ _LOGGER = logging.getLogger(__name__)
 RE_ALPR_PLATE = r"^plate\d*:"
 RE_ALPR_RESULT = r"- (\w*)\s*confidence: (\d*.\d*)"
 
+
+# pylint: disable=too-few-public-methods
 class HAAlpr(object):
     """Wrapper for command line tool alpr."""
 
@@ -36,6 +39,7 @@ class HAAlpr(object):
 
         # send image
         try:
+            # pylint: disable=unused-variable
             stdout, stderr = alpr.communicate(input=image, timeout=10)
             stdout = io.StringIO(str(stdout, 'utf-8'))
         except subprocess.TimeoutExpired:
