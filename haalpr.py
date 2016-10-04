@@ -1,6 +1,9 @@
-import subprocess
-import re
 import io
+import logging
+import re
+import subprocess
+
+_LOGGER = logging.getLogger(__name__)
 
 RE_ALPR_PLATE = r"^plate\d*:"
 RE_ALPR_RESULT = r"- (\w*)\s*confidence: (\d*.\d*)"
@@ -20,7 +23,7 @@ class HAAlpr(object):
         self.__re_plate = re.compile(RE_ALPR_PLATE)
         self.__re_result = re.compile(RE_ALPR_RESULT)
 
-    def recognize_byte(self, image):
+    def recognize_byte(self, image, timeout=10):
         """Process a byte image buffer."""
         result = []
 
@@ -32,8 +35,13 @@ class HAAlpr(object):
         )
 
         # send image
-        stdout, stderr = alpr.communicate(input=image)
-        stdout = io.StringIO(str(stdout, 'utf-8'))
+        try:
+            stdout, stderr = alpr.communicate(input=image, timeout=10)
+            stdout = io.StringIO(str(stdout, 'utf-8'))
+        except subprocess.TimeoutExpired:
+            _LOGGER.error("Alpr process timeout!")
+            alpr.kill()
+            return None
 
         tmp_res = {}
         while True:
@@ -59,4 +67,5 @@ class HAAlpr(object):
                 except ValueError:
                     continue
 
+        _LOGGER.debug("Process alpr with result: %s", result)
         return result
